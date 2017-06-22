@@ -9,147 +9,115 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            using (var context = new LibraryContext())
+            LibraryLogic library = new LibraryLogic();
+
+            Console.WriteLine(@"Press 
+0 - To add the new book
+1 - To update the book
+2 - To Remove the book
+
+10 - To add the new user
+20 - To remove the user
+
+100 - To get list of books by the user
+101 - To get number of author's books
+102 - To find information by the name of the book
+
+1111 - To take the book
+2222 - To return the book");
+
+            try
             {
-                //context.Users.Add(new LibraryUser
-                //{
-                //    Name = "User1",
-                //    Age = 10
-                //});
-
-                //context.Users.Add(new LibraryUser
-                //{
-                //    Name = "User2",
-                //    Age = 12
-                //});
-
-                //context.Users.Add(new LibraryUser
-                //{
-                //    Name = "User3",
-                //    Age = 23
-                //});
-
-                //context.Books.Add(new Book
-                //{
-                //    Name = "Book1",
-                //    Author = "Author1",
-                //    Publisher = "C17-01",
-                //    Year = 1999
-                //});
-
-                //context.Books.Add(new Book
-                //{
-                //    Name = "Book2",
-                //    Author = "Author1",
-                //    Publisher = "C17-01",
-                //    Year = 1998
-                //});
-
-                //context.Books.Add(new Book
-                //{
-                //    Name = "Book3",
-                //    Author = "Author1",
-                //    Publisher = "C17-01",
-                //    Year = 1989
-                //});
-
-                //context.Books.Add(new Book
-                //{
-                //    Name = "Book4",
-                //    Author = "Author2",
-                //    Publisher = "world",
-                //    Year = 2017
-                //});
-
-                //context.Books.Add(new Book
-                //{
-                //    Name = "Book5",
-                //    Author = "Author3",
-                //    Publisher = "world",
-                //    Year = 2017
-                //});
-
-                //context.Books.Add(new Book
-                //{
-                //    Name = "Book6",
-                //    Author = "Author3",
-                //    Publisher = "world",
-                //    Year = 2015
-                //});
-
-                //context.SaveChanges();
-
-
-
-            }
-        }
-
-        static void ActionWithBook(Book book, short indexAction)
-        {
-            using (var context = new LibraryContext())
-            {
-                if (indexAction == 0) // Add book
+                short action = short.Parse(Console.ReadLine());
+                using (var context = new LibraryContext())
                 {
-                    context.Books.Add(new Book
-                    {
-                        Name = book.Name,
-                        Author = book.Author,
-                        Publisher = book.Publisher,
-                        Year = book.Year
-                    });
-                }
-                else if (indexAction == 1) // Remove book
-                {
-                    var removeBook = context.Books.Where(b => b.Id == book.Id).FirstOrDefault();
-                    context.Books.Remove(removeBook);
-                }
+                    library.Context = context;
 
-                else if (indexAction ==2) // Update book
-                {
-                    var updateBook = context.Books.Where(b => b.Id == book.Id).FirstOrDefault();
-                   
-                    Console.WriteLine("Enter book name:");
-                    string Name = Console.ReadLine();
-                    Console.WriteLine("Enter book author:");
-                    string Author = Console.ReadLine();
-                    Console.WriteLine("Enter book publisher:");
-                    string Publisher = Console.ReadLine();
-                    Console.WriteLine("Enter book year:");
-                    int Year = int.Parse(Console.ReadLine());
+                    if (action == 0 || action == 1 || action == 2)
+                        library.ActionWithBook(action);
+                    else if (action == 10 || action == 20)
+                        library.ActionWithUsers(action);
+                    else if (action == 1111 || action == 2222)
+                        library.LibraryAction(action);
+                    else if (action == 100 || action == 101 || action == 102)
+                        library.LibraryQuery(action);
 
-                    updateBook.Name = Name;
-                    updateBook.Author = Author;
-                    updateBook.Publisher = Publisher;
-                    updateBook.Year = Year;
-                }
+                    // Создала базу:
+                    //context.Users.Add(new LibraryUser
+                    //{
+                    //    Name = "User1",
+                    //    Age = 10
+                    //});
 
-                context.SaveChanges();
-            }
-        }
+                    //context.Users.Add(new LibraryUser
+                    //{
+                    //    Name = "User2",
+                    //    Age = 12
+                    //});
 
-        static void ActionWithUser(short indexAction)
-        {
-            using (var context = new LibraryContext())
-            {
-                if(indexAction ==0)
-                {
-                    Console.WriteLine("Enter new user name:");
-                    string Name = Console.ReadLine();
-                    
-                    Console.WriteLine("Enter new user old:");
-                    int Age = int.Parse(Console.ReadLine());
+                    //context.Users.Add(new LibraryUser
+                    //{
+                    //    Name = "User3",
+                    //    Age = 23
+                    //});
 
-                    System.Data.SqlClient.SqlParameter paramName = new System.Data.SqlClient.SqlParameter("@name", Name);
-                    System.Data.SqlClient.SqlParameter paramAge = new System.Data.SqlClient.SqlParameter("@age", Age);
+                    //context.Books.Add(new Book
+                    //{
+                    //    Name = "Book1",
+                    //    Author = "Author1",
+                    //    Publisher = "C17-01",
+                    //    Year = 1999
+                    //});
 
-                    var numberOfRowInserted = context.Database.SqlQuery<LibraryUser>("INSERT INTO LibraryUsers(Name, Age)"+
-"VALUES(@name, @age);", paramName, paramAge);
+                    //context.Books.Add(new Book
+                    //{
+                    //    Name = "Book2",
+                    //    Author = "Author1",
+                    //    Publisher = "C17-01",
+                    //    Year = 1998
+                    //});
+
+                    //context.Books.Add(new Book
+                    //{
+                    //    Name = "Book3",
+                    //    Author = "Author1",
+                    //    Publisher = "C17-01",
+                    //    Year = 1989
+                    //});
+
+                    //context.Books.Add(new Book
+                    //{
+                    //    Name = "Book4",
+                    //    Author = "Author2",
+                    //    Publisher = "world",
+                    //    Year = 2017
+                    //});
+
+                    //context.Books.Add(new Book
+                    //{
+                    //    Name = "Book5",
+                    //    Author = "Author3",
+                    //    Publisher = "world",
+                    //    Year = 2017
+                    //});
+
+                    //context.Books.Add(new Book
+                    //{
+                    //    Name = "Book6",
+                    //    Author = "Author3",
+                    //    Publisher = "world",
+                    //    Year = 2015
+                    //});
+
+                    //context.SaveChanges();
                 }
             }
+            catch
+            {
+                Main();
+            }
         }
-    
-        
     }
 }
