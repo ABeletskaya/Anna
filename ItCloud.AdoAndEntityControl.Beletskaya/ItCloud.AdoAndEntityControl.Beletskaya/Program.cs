@@ -13,20 +13,7 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
         {
             LibraryLogic library = new LibraryLogic();
 
-            Console.WriteLine(@"Press 
-0 - To add the new book
-1 - To update the book
-2 - To Remove the book
-
-10 - To add the new user
-20 - To remove the user
-
-100 - To get list of books by the user
-101 - To get number of author's books
-102 - To find information by the name of the book
-
-1111 - To take the book
-2222 - To return the book");
+            ShowMenuList();
 
             try
             {
@@ -43,6 +30,8 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
                         library.LibraryAction(action);
                     else if (action == 100 || action == 101 || action == 102)
                         library.LibraryQuery(action);
+                    else
+                        Main();
 
                     // Создала базу:
                     //context.Users.Add(new LibraryUser
@@ -113,11 +102,35 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
 
                     //context.SaveChanges();
                 }
+                Console.WriteLine("___________________________________________________________\nDo you want to continue?Y/N");
+                string answer = Console.ReadLine();
+                if (answer == "Y" || answer == "y")
+                    Main();
             }
             catch
             {
                 Main();
             }
+        }
+        static void ShowMenuList()
+        {
+            Console.WriteLine(@"With Entity Framework
+
+Press 
+0 - To add the new book
+1 - To update the book
+2 - To Remove the book
+
+10 - To add the new user
+20 - To remove the user
+
+100 - To get list of books by the user
+101 - To get number of author's books
+102 - To find information by the name of the book
+
+1111 - To take the book
+2222 - To return the book
+");
         }
     }
 }

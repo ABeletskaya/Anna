@@ -97,10 +97,11 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
                 });
 
                 Context.SaveChanges();
+                Console.WriteLine("The command completed successfully");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "AddBook method   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   AddBook method   " + ex.ToString());
             }
         }
 
@@ -121,10 +122,11 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
                 updateBook.Year = BookYear;
 
                 Context.SaveChanges();
+                Console.WriteLine("The command completed successfully");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "UpdateBook method   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   UpdateBook method   " + ex.ToString());
             }
         }
 
@@ -139,10 +141,11 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
                 Context.Books.Remove(removeBook);
 
                 Context.SaveChanges();
+                Console.WriteLine("The command completed successfully");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "RemoveBook method   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   RemoveBook method   " + ex.ToString());
             }
 
         }
@@ -151,7 +154,7 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
         {
             try
             {
-                Console.WriteLine("To add the Book user, enter his name, age");
+                Console.WriteLine("To add the user, enter his name, age");
 
                 Console.WriteLine("Enter Book user name:");
                 UserName = Console.ReadLine();
@@ -164,10 +167,11 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
 
                 var numberOfRowInserted = Context.Database.ExecuteSqlCommand("INSERT INTO LibraryUsers(Name, Age)" +
                "VALUES(@name, @age);", paramName, paramAge);
+                Console.WriteLine("The command completed successfully");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "AddUser method   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   AddUser method   " + ex.ToString());
             }
         }
 
@@ -179,10 +183,11 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
                 Id = int.Parse(Console.ReadLine());
 
                 var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"DELETE FROM LibraryUsers WHERE Id = {Id};");
+                Console.WriteLine("The command completed successfully");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "RemoveUser method   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   RemoveUser method   " + ex.ToString());
             }
         }
 
@@ -197,10 +202,11 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
 
                 System.Data.SqlClient.SqlParameter paramName = new System.Data.SqlClient.SqlParameter("@name", BookName);
                 var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"UPDATE Books SET UserId = {Id} WHERE Name = '{BookName}'; ");
+                Console.WriteLine("The command completed successfully");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "TakeBook method   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   TakeBook method   " + ex.ToString());
             }
         }
 
@@ -211,12 +217,12 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
                 Console.WriteLine("To return the book enter it name:");
                 BookName = Console.ReadLine();
 
-                System.Data.SqlClient.SqlParameter paramName = new System.Data.SqlClient.SqlParameter("@name", BookName);
                 var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"UPDATE Books SET UserId = null WHERE Name = '{BookName}'; ");
+                Console.WriteLine("The command completed successfully");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "ReturnBook method   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   ReturnBook method   " + ex.ToString());
             }
         }
 
@@ -234,7 +240,7 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "QueryUsersAllBook   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   QueryUsersAllBook   " + ex.ToString());
             }
         }
 
@@ -247,11 +253,11 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
 
                 int countBook = Context.Books.Count(b => b.Author == BookAuthor);
 
-                Console.WriteLine($"countBook of {BookAuthor} - {countBook}");
+                Console.WriteLine($"countBook of {BookAuthor} is {countBook}");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "QueryUsersAllBook   " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   QueryUsersAllBook   " + ex.ToString());
             }
         }
 
@@ -267,7 +273,7 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "QueryBookInfo  " + ex.ToString());
+                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   QueryBookInfo  " + ex.ToString());
             }
         }
     }
