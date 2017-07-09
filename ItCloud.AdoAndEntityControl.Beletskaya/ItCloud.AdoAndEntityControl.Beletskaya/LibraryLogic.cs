@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,271 +11,265 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
 {
     class LibraryLogic
     {
-        public LibraryContext Context { get; set; }
-
-        private string BookName;
-        private string BookAuthor;
-        private string BookPublisher;
-        private int BookYear;
-        private int Id;
-        private string UserName;
-        private int UserAge;
-
-        public void ActionWithBook(short indexAction)
+        private string _connectionString;
+        public LibraryLogic(string connectionString)
         {
-            if (indexAction == 0) // Add book
-            {
-                AddBook();
-            }
-            else if (indexAction == 1) // Update book
-            {
-                UpdateBook();
-            }
-            else if (indexAction == 2) // Remove book
-            {
-                RemoveBook();
-            }
+            _connectionString = connectionString;
         }
 
-        public void ActionWithUsers(short indexAction)
+        public bool AddBook(Book book)
         {
-            if (indexAction == 10)
-                AddUser();
-            else if (indexAction == 20)
-                RemoveUser();
-        }
-
-        public void LibraryAction(short indexAction)
-        {
-            if (indexAction == 1111)
-                TakeBook();
-            else if (indexAction == 2222)
-                ReturnBook();
-        }
-
-        public void LibraryQuery(short indexAction)
-        {
-            if (indexAction == 100)
-                QueryUsersAllBook();
-            if (indexAction == 101)
-                QueryCountBookAuthor();
-            if (indexAction == 102)
-                QueryBookInfo();
-        }
-
-        private void EnterBookInfo()
-        {
+            bool isSuccess = true;
             try
             {
-                Console.WriteLine("Enter book name:");
-                BookName = Console.ReadLine();
-                Console.WriteLine("Enter book author:");
-                BookAuthor = Console.ReadLine();
-                Console.WriteLine("Enter book publisher:");
-                BookPublisher = Console.ReadLine();
-                Console.WriteLine("Enter book year:");
-                BookYear = int.Parse(Console.ReadLine());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }
-
-        private void AddBook()
-        {
-            try
-            {
-                Console.WriteLine("To add the book, enter it name, author, publisher, year");
-                EnterBookInfo();
-
-                Context.Books.Add(new Book
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    Name = BookName,
-                    Author = BookAuthor,
-                    Publisher = BookPublisher,
-                    Year = BookYear
-                });
-
-                Context.SaveChanges();
-                Console.WriteLine("The command completed successfully");
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        Context.Books.Add(new Book
+                        {
+                            Name = book.Name,
+                            Author = book.Author,
+                            Publisher = book.Publisher,
+                            Year = book.Year
+                        });
+                        Context.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   AddBook method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   AddBook method   " + ex.ToString());
             }
+            return isSuccess;
         }
 
-        private void UpdateBook()
+        public bool UpdateBook(Book book, int Id)
         {
+            bool isSuccess = true;
             try
             {
-                Console.WriteLine("To update the book, enter it id: ");
-                Id = int.Parse(Console.ReadLine());
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        var updateBook = Context.Books.Where(b => b.Id == Id).FirstOrDefault();
 
-                EnterBookInfo();
-
-                var updateBook = Context.Books.Where(b => b.Id == Id).FirstOrDefault();
-
-                updateBook.Name = BookName;
-                updateBook.Author = BookAuthor;
-                updateBook.Publisher = BookPublisher;
-                updateBook.Year = BookYear;
-
-                Context.SaveChanges();
-                Console.WriteLine("The command completed successfully");
+                        updateBook.Name = book.Name;
+                        updateBook.Author = book.Author;
+                        updateBook.Publisher = book.Publisher;
+                        updateBook.Year = book.Year;
+                        Context.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   UpdateBook method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   UpdateBook method   " + ex.ToString());
             }
+            return isSuccess;
         }
 
-        private void RemoveBook()
+        public bool RemoveBook(int Id)
         {
+            bool isSuccess = true;
             try
             {
-                Console.WriteLine("To remove the book enter it id:");
-                Id = int.Parse(Console.ReadLine());
-
-                var removeBook = Context.Books.Where(b => b.Id == Id).FirstOrDefault();
-                Context.Books.Remove(removeBook);
-
-                Context.SaveChanges();
-                Console.WriteLine("The command completed successfully");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        var removeBook = Context.Books.Where(b => b.Id == Id).FirstOrDefault();
+                        Context.Books.Remove(removeBook);
+                        Context.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   RemoveBook method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   RemoveBook method   " + ex.ToString());
             }
-
+            return isSuccess;
         }
 
-        private void AddUser()
+        public bool AddUser(LibraryUser user)
         {
+            bool isSuccess = true;
             try
             {
-                Console.WriteLine("To add the user, enter his name, age");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        SqlParameter Name = new SqlParameter("@name", user.Name);
+                        SqlParameter Age = new SqlParameter("@age", user.Age);
 
-                Console.WriteLine("Enter Book user name:");
-                UserName = Console.ReadLine();
-                Console.WriteLine("Enter Book user age:");
-                UserAge = int.Parse(Console.ReadLine());
-
-
-                System.Data.SqlClient.SqlParameter paramName = new System.Data.SqlClient.SqlParameter("@name", UserName);
-                System.Data.SqlClient.SqlParameter paramAge = new System.Data.SqlClient.SqlParameter("@age", UserAge);
-
-                var numberOfRowInserted = Context.Database.ExecuteSqlCommand("INSERT INTO LibraryUsers(Name, Age)" +
-               "VALUES(@name, @age);", paramName, paramAge);
-                Console.WriteLine("The command completed successfully");
+                        var numberOfRowInserted = Context.Database.ExecuteSqlCommand("INSERT INTO LibraryUsers(Name, Age) VALUES(@name, @age);", Name, Age);
+                        if (numberOfRowInserted == 0)
+                            isSuccess = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   AddUser method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   AddUser method   " + ex.ToString());
             }
+            return isSuccess;
         }
 
-        private void RemoveUser()
+        public bool RemoveUser(int Id)
         {
+            bool isSuccess = true;
             try
             {
-                Console.WriteLine("To remove the book enter it id:");
-                Id = int.Parse(Console.ReadLine());
-
-                var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"DELETE FROM LibraryUsers WHERE Id = {Id};");
-                Console.WriteLine("The command completed successfully");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"DELETE FROM LibraryUsers WHERE Id = {Id};");
+                        if (numberOfRowInserted == 0)
+                            isSuccess = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   RemoveUser method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   RemoveUser method   " + ex.ToString());
             }
+            return isSuccess;
         }
 
-        private void TakeBook()
+        public bool TakeBook(int Id, string bookName)
         {
+            bool isSuccess = true;
             try
             {
-                Console.WriteLine("Enter user's id");
-                Id = int.Parse(Console.ReadLine());
-                Console.WriteLine("Enter the book name:");
-                BookName = Console.ReadLine();
-
-                System.Data.SqlClient.SqlParameter paramName = new System.Data.SqlClient.SqlParameter("@name", BookName);
-                var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"UPDATE Books SET UserId = {Id} WHERE Name = '{BookName}'; ");
-                Console.WriteLine("The command completed successfully");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        SqlParameter paramName = new SqlParameter("@name", bookName);
+                        var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"UPDATE Books SET UserId = {Id} WHERE Name = '{bookName}'; ");
+                        if (numberOfRowInserted == 0)
+                            isSuccess = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   TakeBook method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   TakeBook method   " + ex.ToString());
             }
+            return isSuccess;
         }
 
-        private void ReturnBook()
+        public bool ReturnBook(string bookName)
         {
+            bool isSuccess = true;
             try
             {
-                Console.WriteLine("To return the book enter it name:");
-                BookName = Console.ReadLine();
-
-                var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"UPDATE Books SET UserId = null WHERE Name = '{BookName}'; ");
-                Console.WriteLine("The command completed successfully");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        var numberOfRowInserted = Context.Database.ExecuteSqlCommand($"UPDATE Books SET UserId = null WHERE Name = '{bookName}'; ");
+                        if (numberOfRowInserted == 0)
+                            isSuccess = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   ReturnBook method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   ReturnBook method   " + ex.ToString());
             }
+            return isSuccess;
         }
 
-        private void QueryUsersAllBook()
+        public List<Book> QueryUserAllBook(int userId, out bool isSuccess)
         {
+            List<Book> _books = new List<Book>();
             try
             {
-                Console.WriteLine("Enter user's id");
-                Id = int.Parse(Console.ReadLine());
-
-                System.Data.SqlClient.SqlParameter param = new System.Data.SqlClient.SqlParameter("@id", Id);
-                var books = Context.Database.SqlQuery<Book>("SELECT * FROM Books WHERE UserId = @id; ", param);
-                foreach (var book in books)
-                    Console.WriteLine(book);
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        SqlParameter param = new SqlParameter("@id", userId);
+                        _books = Context.Database.SqlQuery<Book>("SELECT * FROM Books WHERE UserId = @id; ", param).ToList();
+                    }
+                }
+                isSuccess = (_books.Count == 0) ? false : true;
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   QueryUsersAllBook   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   QueryUsersAllBook   " + ex.ToString());
             }
+            return _books;
         }
 
-        private void QueryCountBookAuthor()
+        public int QueryCountBookAuthor(string author, out bool isSuccess)
         {
+            int countBook = 0;
             try
             {
-                Console.WriteLine("Enter author");
-                BookAuthor = Console.ReadLine();
-
-                int countBook = Context.Books.Count(b => b.Author == BookAuthor);
-
-                Console.WriteLine($"countBook of {BookAuthor} is {countBook}");
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        countBook = Context.Books.Count(b => b.Author == author);
+                    }
+                }
+                if (countBook == 0)
+                    isSuccess = false;
+                else
+                    isSuccess = true;
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   QueryUsersAllBook   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   QueryUsersAllBook   " + ex.ToString());
             }
+            return countBook;
         }
 
-        private void QueryBookInfo()
+        public Book QueryBookInfo(string bookName, out bool isSuccess)
         {
+            Book book = new Book();
+            book.Name = bookName;
             try
             {
-                Console.WriteLine("Enter the book name");
-                BookName = Console.ReadLine();
-
-                Book bookInfo = Context.Books.First(b => b.Name == BookName);
-                Console.WriteLine(bookInfo);
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var Context = new LibraryContext())
+                    {
+                        book = Context.Books.First(b => b.Name == bookName);
+                    }
+                }
+                isSuccess = (book.Id == 0) ? false : true;
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt   ", DateTime.Now.ToString() + "   QueryBookInfo  " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception Entity log.txt", DateTime.Now.ToString() + "   QueryBookInfo  " + ex.ToString());
             }
+            return book;
         }
     }
 }
