@@ -10,341 +10,303 @@ namespace Ado
 {
     class LibraryLogic
     {
-        public SqlConnection Connection { get; set; }
-
-        private string BookName;
-        private string BookAuthor;
-        private string BookPublisher;
-        private int BookYear;
-        private int Id;
-        private string UserName;
-        private int UserAge;
-
-        private List<Book> Books = new List<Book>();
-
-        public void ActionWithBook(short indexAction)
+        private List<Book> _books = new List<Book>();
+        private string _connectionString;
+        public LibraryLogic(string connectionString)
         {
-            if (indexAction == 0) // Add book
-            {
-                AddBook();
-            }
-            else if (indexAction == 1) // Update book
-            {
-                UpdateBook();
-            }
-            else if (indexAction == 2) // Remove book
-            {
-                RemoveBook();
-            }
+            _connectionString = connectionString;
         }
 
-        public void ActionWithUsers(short indexAction)
-        {
-            if (indexAction == 10)
-                AddUser();
-            else if (indexAction == 20)
-                RemoveUser();
-        }
-
-        public void LibraryAction(short indexAction)
-        {
-            if (indexAction == 1111)
-                TakeBook();
-            else if (indexAction == 2222)
-                ReturnBook();
-        }
-
-        public void LibraryQuery(short indexAction)
-        {
-            if (indexAction == 100)
-                QueryUsersAllBook();
-            if (indexAction == 101)
-                QueryCountBookAuthor();
-            if (indexAction == 102)
-                QueryBookInfo();
-        }
-
-        private void EnterBookInfo()
+        public bool AddBook(Book book)
         {
             try
             {
-                Console.WriteLine("Enter book name:");
-                BookName = Console.ReadLine();
-                Console.WriteLine("Enter book author:");
-                BookAuthor = Console.ReadLine();
-                Console.WriteLine("Enter book publisher:");
-                BookPublisher = Console.ReadLine();
-                Console.WriteLine("Enter book year:");
-                BookYear = int.Parse(Console.ReadLine());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }
-
-        private void AddBook()
-        {
-            Console.WriteLine("To add the book, enter it name, author, publisher, year");
-            EnterBookInfo();
-            try
-            {
-                using (var command = Connection.CreateCommand())
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    command.CommandText = $@"INSERT INTO Books (Name, Author, Publisher,Year) VALUES(@name, @author, @publisher, @year);";
-
-                    System.Data.SqlClient.SqlParameter name = new System.Data.SqlClient.SqlParameter("@name", BookName);
-                    command.Parameters.Add(name);
-                    System.Data.SqlClient.SqlParameter author = new System.Data.SqlClient.SqlParameter("@author", BookAuthor);
-                    command.Parameters.Add(author);
-                    System.Data.SqlClient.SqlParameter publisher = new System.Data.SqlClient.SqlParameter("@publisher", BookPublisher);
-                    command.Parameters.Add(publisher);
-                    System.Data.SqlClient.SqlParameter year = new System.Data.SqlClient.SqlParameter("@year", BookYear);
-                    command.Parameters.Add(year);
-
-                    command.ExecuteNonQuery();
-                }
-                Console.WriteLine("The command completed successfully");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    AddBook method   " + ex.ToString());
-            }
-        }
-
-        private void UpdateBook()
-        {
-            try
-            {
-                Console.WriteLine("To update the book, enter it id: ");
-                Id = int.Parse(Console.ReadLine());
-
-                EnterBookInfo();
-
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $@"UPDATE Books SET Name = '{BookName}', Author =  '{BookAuthor}', Publisher = '{BookPublisher}', Year = '{BookYear}'  WHERE Id = @id; ";
-                    System.Data.SqlClient.SqlParameter id = new System.Data.SqlClient.SqlParameter("@id", Id);
-                    command.Parameters.Add(id);
-
-                    command.ExecuteNonQuery();
-                }
-                Console.WriteLine("The command completed successfully");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    UpdateBook method   " + ex.ToString());
-            }
-
-        }
-
-        private void RemoveBook()
-        {
-            try
-            {
-                Console.WriteLine("To remove the book enter it id:");
-                Id = int.Parse(Console.ReadLine());
-
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $@"DELETE FROM Books WHERE Id = @id;";
-                    System.Data.SqlClient.SqlParameter id = new System.Data.SqlClient.SqlParameter("@id", Id);
-                    command.Parameters.Add(id);
-
-                    command.ExecuteNonQuery();
-                }
-                Console.WriteLine("The command completed successfully");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    RemoveBook method   " + ex.ToString());
-            }
-        }
-
-        private void AddUser()
-        {
-            Console.WriteLine("To add the user, enter his name, age");
-
-            Console.WriteLine("Enter Book user name:");
-            UserName = Console.ReadLine();
-            Console.WriteLine("Enter Book user age:");
-            UserAge = int.Parse(Console.ReadLine());
-            try
-            {
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $@"INSERT INTO LibraryUsers(Name, Age)	VALUES(@name, @age);";
-                    System.Data.SqlClient.SqlParameter name = new System.Data.SqlClient.SqlParameter("@name", UserName);
-                    command.Parameters.Add(name);
-                    System.Data.SqlClient.SqlParameter age = new System.Data.SqlClient.SqlParameter("@age", UserAge);
-                    command.Parameters.Add(age);
-
-                    command.ExecuteNonQuery();
-                }
-                Console.WriteLine("The command completed successfully");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    AddUser method   " + ex.ToString());
-            }
-        }
-
-        private void RemoveUser()
-        {
-            try
-            {
-                Console.WriteLine("To remove the book enter it id:");
-                Id = int.Parse(Console.ReadLine());
-
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $"DELETE FROM LibraryUsers WHERE Id = {Id};";
-                    command.ExecuteNonQuery();
-                }
-                Console.WriteLine("The command completed successfully");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    RemoveUser method   " + ex.ToString());
-            }
-        }
-
-        private void TakeBook()
-        {
-            try
-            {
-                Console.WriteLine("Enter user's id");
-                Id = int.Parse(Console.ReadLine());
-                Console.WriteLine("Enter the book name:");
-                BookName = Console.ReadLine();
-
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $"UPDATE Books SET UserId = @id WHERE Name = @name;";
-                    System.Data.SqlClient.SqlParameter name = new System.Data.SqlClient.SqlParameter("@name", BookName);
-                    command.Parameters.Add(name);
-                    System.Data.SqlClient.SqlParameter id = new System.Data.SqlClient.SqlParameter("@id", Id);
-                    command.Parameters.Add(id);
-                    command.ExecuteNonQuery();
-                }
-                Console.WriteLine("The command completed successfully");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    TakeBook method   " + ex.ToString());
-            }
-        }
-
-        private void ReturnBook()
-        {
-            try
-            {
-                Console.WriteLine("To return the book enter it name:");
-                BookName = Console.ReadLine();
-
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $"UPDATE Books SET UserId = null WHERE Name = @name;";
-                    System.Data.SqlClient.SqlParameter name = new System.Data.SqlClient.SqlParameter("@name", BookName);
-                    command.Parameters.Add(name);
-                    command.ExecuteNonQuery();
-                }
-                Console.WriteLine("The command completed successfully");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    ReturnBook method   " + ex.ToString());
-            }
-        }
-
-        private void QueryUsersAllBook()
-        {
-            try
-            {
-                Console.WriteLine("Enter user's id");
-                Id = int.Parse(Console.ReadLine());
-
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $"SELECT * FROM Books WHERE UserId = {Id};";
-                    using (var reader = command.ExecuteReader())
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
                     {
-                        while (reader.Read())
+                        command.CommandText = $@"INSERT INTO Books (Name, Author, Publisher,Year) VALUES(@name, @author, @publisher, @year);";
+
+                        SqlParameter name = new SqlParameter("@name", book.Name);
+                        command.Parameters.Add(name);
+                        SqlParameter author = new SqlParameter("@author", book.Author);
+                        command.Parameters.Add(author);
+                        SqlParameter publisher = new SqlParameter("@publisher", book.Publisher);
+                        command.Parameters.Add(publisher);
+                        SqlParameter year = new SqlParameter("@year", book.Year);
+                        command.Parameters.Add(year);
+
+                        if (command.ExecuteNonQuery() == 0)
+                            return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    AddBook method   " + ex.ToString() + "\n\n");
+                return false;
+            }
+            return true;
+        }
+
+        public bool UpdateBook(Book book, int Id)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = $@"UPDATE Books SET Name = '{book.Name}', Author =  '{book.Author}',
+                                                Publisher = '{book.Publisher}', Year = '{book.Year}'  WHERE Id = @id; ";
+                        SqlParameter id = new SqlParameter("@id", Id);
+                        command.Parameters.Add(id);
+                        if (command.ExecuteNonQuery() == 0)
+                            return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    UpdateBook method   " + ex.ToString() + "\n\n");
+                return false;
+            }
+            return true;
+        }
+
+        public bool RemoveBook(int Id)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = $@"DELETE FROM Books WHERE Id = @id;";
+                        SqlParameter id = new SqlParameter("@id", Id);
+                        command.Parameters.Add(id);
+                        if (command.ExecuteNonQuery() == 0)
+                            return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    RemoveBook method   " + ex.ToString() + "\n\n");
+                return false;
+            }
+            return true;
+        }
+
+        public bool AddUser(LibraryUser user)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = $@"INSERT INTO LibraryUsers(Name, Age)	VALUES(@name, @age);";
+
+                        SqlParameter name = new SqlParameter("@name", user.Name);
+                        command.Parameters.Add(name);
+                        SqlParameter age = new SqlParameter("@age", user.Age);
+                        command.Parameters.Add(age);
+
+                        if (command.ExecuteNonQuery() == 0)
+                            return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    AddUser method   " + ex.ToString() + "\n\n");
+                return false;
+            }
+            return true;
+        }
+
+        public bool RemoveUser(int Id)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = $"DELETE FROM LibraryUsers WHERE Id = {Id};";
+                        if (command.ExecuteNonQuery() == 0)
+                            return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    RemoveUser method   " + ex.ToString() + "\n\n");
+                return false;
+            }
+            return true;
+        }
+
+        public bool TakeBook(int Id, string bookName)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = $"UPDATE Books SET UserId = @id WHERE Name = @name;";
+                        SqlParameter name = new SqlParameter("@name", bookName);
+                        command.Parameters.Add(name);
+                        SqlParameter id = new SqlParameter("@id", Id);
+                        command.Parameters.Add(id);
+                        if (command.ExecuteNonQuery() == 0)
+                            return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    TakeBook method   " + ex.ToString() + "\n\n");
+                return false;
+            }
+            return true;
+        }
+
+        public bool ReturnBook(string bookName)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = $"UPDATE Books SET UserId = null WHERE Name = @name;";
+                        SqlParameter name = new SqlParameter("@name", bookName);
+                        command.Parameters.Add(name);
+                        if (command.ExecuteNonQuery() == 0)
+                            return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    ReturnBook method   " + ex.ToString() + "\n\n");
+                return false;
+            }
+            return true;
+        }
+
+        public List<Book> QueryUserAllBook(int userId, out bool isSuccess)
+        {
+            _books.Clear();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = $"SELECT * FROM Books WHERE UserId = {userId};";
+                        using (var reader = command.ExecuteReader())
                         {
-                            Books.Add(new Book
+                            while (reader.Read())
                             {
-                                Id = (int)reader["Id"],
-                                Name = (string)reader["Name"],
-                                Author = (string)reader["Author"],
-                                Publisher = (string)reader["Publisher"],
-                                Year = (int)reader["Year"],
-                                UserId = reader["UserId"] != DBNull.Value ? (int)reader["UserId"] : 0
-                            });
+                                _books.Add(new Book
+                                {
+                                    Id = (int)reader["Id"],
+                                    Name = (string)reader["Name"],
+                                    Author = (string)reader["Author"],
+                                    Publisher = (string)reader["Publisher"],
+                                    Year = (int)reader["Year"],
+                                    UserId = reader["UserId"] != DBNull.Value ? (int)reader["UserId"] : 0
+                                });
+                            }
                         }
                     }
                 }
-                if (Books.Count > 0)
+                isSuccess = (_books.Count == 0) ? false : true;
+            }
+            catch (Exception ex)
+            {
+                isSuccess = false;
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    QueryUsersAllBook method   " + ex.ToString() + "\n\n");
+            }
+            return _books;
+        }
+
+        public int QueryCountBookAuthor(string author, out bool isSuccess)
+        {
+            int countBook = 0;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    foreach (var book in Books)
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
                     {
-                        Console.WriteLine(book);
+                        command.CommandText = $"SELECT COUNT(1) FROM Books WHERE Author = '{author}'; ";
+                        countBook = (int)command.ExecuteScalar();
                     }
-                    Books.Clear();
+                    if (countBook == 0)
+                        isSuccess = false;
+                    else
+                        isSuccess = true;
                 }
-                else
-                    Console.WriteLine("The user with this Id does not have a book");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    QueryUsersAllBook method   " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception ADO.NET log.txt", DateTime.Now.ToString() + "    QueryCountBookAuthor   " + ex.ToString() + "\n\n");
             }
+            return countBook;
         }
 
-        private void QueryCountBookAuthor()
+        public Book QueryBookInfo(string bookName, out bool isSuccess)
         {
+            Book book = new Book();
+            book.Name = bookName;
             try
             {
-                Console.WriteLine("Enter author");
-                BookAuthor = Console.ReadLine();
-                int countBook;
-
-                using (var command = Connection.CreateCommand())
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    command.CommandText = $"SELECT COUNT(1) FROM Books WHERE Author = '{BookAuthor}'; ";
-                    countBook = (int)command.ExecuteScalar();
-                }
-                Console.WriteLine($"countBook of {BookAuthor} is {countBook}");
-            }
-            catch (Exception ex)
-            {
-                File.WriteAllText(@"Exception ADO.NET log.txt   ", DateTime.Now.ToString() + "    QueryCountBookAuthor   " + ex.ToString());
-            }
-        }
-
-        private void QueryBookInfo()
-        {
-            try
-            {
-                Console.WriteLine("Enter the book name");
-                BookName = Console.ReadLine();
-
-                using (var command = Connection.CreateCommand())
-                {
-                    command.CommandText = $"SELECT * FROM  Books WHERE Name = '{BookName}';";
-                    using (var reader = command.ExecuteReader())
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
                     {
-                        while (reader.Read())
+                        command.CommandText = $"SELECT * FROM  Books WHERE Name = '{bookName}';";
+                        using (var reader = command.ExecuteReader())
                         {
-                            Console.WriteLine($"{(int)reader["Id"]} {(string)reader["Name"]} {(string)reader["Author"]}"
-                                + $"{(string)reader["Publisher"]} {(int)reader["Year"]} {(reader["UserId"] != DBNull.Value ? (int)reader["UserId"] : 0) }");
+                            while (reader.Read())
+                            {
+                                book.Id = (int)reader["Id"];
+                                book.Name = (string)reader["Name"];
+                                book.Author = (string)reader["Author"];
+                                book.Publisher = (string)reader["Publisher"];
+                                book.Year = (int)reader["Year"];
+                                book.UserId = reader["UserId"] != DBNull.Value ? (int)reader["UserId"] : 0;
+                            }
                         }
+                        if (book.Id == 0)
+                            isSuccess = false;
+                        else
+                            isSuccess = true;
                     }
                 }
             }
             catch (Exception ex)
             {
-                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "QueryBookInfo  " + ex.ToString());
+                isSuccess = false;
+                File.WriteAllText(@"Exception log.txt", DateTime.Now.ToString() + "QueryBookInfo  " + ex.ToString() + "\n\n");
             }
+            return book;
         }
     }
 }
