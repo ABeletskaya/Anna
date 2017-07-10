@@ -26,9 +26,6 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
             try
             {
                 short action = short.Parse(Console.ReadLine());
-
-
-
                 switch (action)
                 {
                     case 0: // Add book
@@ -205,9 +202,7 @@ namespace ItCloud.AdoAndEntityControl.Beletskaya
                 //    Year = 2015
                 //});
 
-                //context.SaveChanges();
-               
-
+                //context.SaveChanges();             
             }
             catch (Exception ex)
             {
@@ -238,7 +233,7 @@ Press
 ");
         }
 
-        static bool CorrectEnterBookInfo(Book book) // подумать как сделать флаг, если неудачный пользовательский ввод, чтобы и на добавление книги не шло
+        static bool CorrectEnterBookInfo(Book book) 
         {
             bool isSuccess = true;
             try
